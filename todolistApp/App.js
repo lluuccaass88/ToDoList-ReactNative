@@ -1,29 +1,30 @@
 import { StatusBar } from 'expo-status-bar';
 import React, {useState, useEffect} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Plataform } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
 
 export default function App() {
-  const [task, setTask] = useState([])
-  const [newTask, setNewTask] = useState('')
+  const [task, setTask] = useState(['Gite', 'Node', 'ReactNative'])
+  const [newTask, setNewTask] = useState()
 
   return (
-    <>
+  <>
+  <KeyboardAvoidingView keyboardVerticalOffset={0} behavior="padding" style={{flex: 1}} enabled={ Plataform.OS === "ios"} >
     <View style={styles.container}>
       <View style={styles.title}>
         <FlatList
+        style={styles.flatList} 
         data={task}
         keyExtractor={item => item.toString()}
         showsVerticalScrollIndicator={false}
-        renderItem={({item}) => {
-          <View> 
-            <Text>{item}</Text>
+        renderItem={({item}) => (
+          <View style={styles.ContainerView}> 
+            <Text style={styles.texto} > {item} </Text>
             <TouchableOpacity>
-              <MaterialIcons name="delete-forever" size={25} color="#f64c75" />
+              <MaterialIcons name='delete-forever' size={25} color="#f64c75" />
             </TouchableOpacity>
           </View>
-        }}
-        style={styles.flatList} 
+          )}
         />
       </View>
       <View style={styles.form}>
@@ -39,6 +40,7 @@ export default function App() {
           </ TouchableOpacity>
       </View>
     </View>
+  </KeyboardAvoidingView>
   </>
   );
 }
@@ -85,6 +87,26 @@ const styles = StyleSheet.create({
   },
   flatList:{
     flex: 1,
-    marginTop: 5
+    marginTop: 5,
+    color: 'white'
+  },
+  ContainerView: {
+    marginBottom: 15, 
+    padding: 15, 
+    borderRadius: 4,
+    backgroundColor: "#eee",
+
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  texto: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 4,
+    textAlign: 'center'
   }
 });
