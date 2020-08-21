@@ -1,26 +1,100 @@
 import { StatusBar } from 'expo-status-bar';
 import React, {useState, useEffect} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Plataform } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Plataform, Keyboard, Alert, AsyncStorage } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
 
 export default function App() {
-  const [task, setTask] = useState(['Gite', 'Node', 'ReactNative'])
-  const [newTask, setNewTask] = useState()
+  const [task, setTask] = useState([])
+  const [newTask, setNewTask] = useState() //Sempre vai receber o valor do input
 
+
+  async function addTask(){
+    if(verification() == true){
+      setTask([...task ,newTask])
+      setNewTask('')
+  
+      Keyboard.dismiss()
+    }else{
+      return;
+    }
+    
+  }
+
+
+  function verification(){
+    const search = task.filter(task => task === newTask)
+
+    if(search.length !== 0){
+      Alert.alert("Atenção", "Nome da tarefa repetido!!!")
+      return false
+    }
+
+    if( newTask === ""){
+      Alert.alert("Atenção", "Digite uma palavra!!!")
+      return false
+    }
+  
+  return true
+
+  }
+
+  async function removeTask(item){
+    Alert.alert(
+      "Deletar task",
+      "Deseja mesmo deletar esta tarefa?",
+      [
+        {
+          text: "Não",
+          onPress:() => {
+            return;
+          },
+          style: 'cancel'
+        },
+        {
+          text: "Sim",
+          onPress:() => {setTask(task.filter(tasks => tasks !== item))},
+        }
+      ],
+      {cancelable: false}
+    )
+    
+
+  }
+
+  useEffect(() => {
+    async function loadData(){
+      const task = await AsyncStorage.getItem("task")
+
+      if(task){
+        setTask(JSON.parse(task));
+      }
+    }
+
+    loadData()
+  }, [])
+
+  useEffect(() => {
+    async function saveData(){
+      AsyncStorage.setItem("task", JSON.stringify(task))
+    }
+    saveData()
+  }, [task])
+  
+  
+  
   return (
   <>
-  <KeyboardAvoidingView keyboardVerticalOffset={0} behavior="padding" style={{flex: 1}} enabled={ Plataform.OS === "ios"} >
     <View style={styles.container}>
       <View style={styles.title}>
         <FlatList
         style={styles.flatList} 
         data={task}
-        keyExtractor={item => item.toString()}
+        keyExtractor={item => item.toString() }
         showsVerticalScrollIndicator={false}
         renderItem={({item}) => (
           <View style={styles.ContainerView}> 
             <Text style={styles.texto} > {item} </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => removeTask(item)}>
               <MaterialIcons name='delete-forever' size={25} color="#f64c75" />
             </TouchableOpacity>
           </View>
@@ -33,14 +107,16 @@ export default function App() {
         placeholderTextColor="#f7fdff"
         autoCorrect={true}
         placeholder="Adicione uma tarefa"
-        maxLength={25}
+        maxLength={40}
+        onChangeText={text => setNewTask(text)}
+        value={newTask}
         />
-          <TouchableOpacity style={styles.button} >
-          <Ionicons name="ios-add" size={24} color="white" />
+          <TouchableOpacity style={styles.button} onPress={() => addTask()} >
+            <Ionicons name="ios-add" size={24} color="white" />
           </ TouchableOpacity>
       </View>
     </View>
-  </KeyboardAvoidingView>
+  
   </>
   );
 }
