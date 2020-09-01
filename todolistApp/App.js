@@ -1,4 +1,4 @@
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from 'expo-status-bar'; 
 import React, {useState, useEffect} from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Plataform, Keyboard, Alert, AsyncStorage } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
